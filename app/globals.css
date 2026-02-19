@@ -2,25 +2,61 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1a2e;
+  --slate-blue: #6b7b8d;
+  --gold: #d4a04a;
+  --gold-light: #e8c47a;
+  --cream: #f5f0e8;
+  --dark: #1a1a2e;
+  --slate: #2d3748;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-slate-blue: var(--slate-blue);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-cream: var(--cream);
+  --color-dark: var(--dark);
+  --color-slate: var(--slate);
+  /* Gud2Go brand colors */
+  --color-brand-primary: var(--brand-primary, #E8907E);
+  --color-brand-primary-light: var(--brand-primary-light, #F5D5CE);
+  --color-brand-secondary: var(--brand-secondary, #333333);
+  --color-brand-accent: var(--brand-accent, #C9A84C);
+  --color-brand-accent-light: var(--brand-accent-light, #DFC478);
+  --color-brand-bg: var(--brand-bg, #FAF7F4);
+  --color-brand-card: var(--brand-card, #FFFFFF);
+  --color-brand-text: var(--brand-text, #333333);
+  --color-brand-muted: var(--brand-muted, #8A8A8A);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--slate-blue);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
 }
