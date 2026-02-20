@@ -78,19 +78,33 @@ export async function syncYelp(config: YelpConfig): Promise<YelpMetrics> {
     `/businesses/${encodeURIComponent(business_id)}`
   )) as YelpBusiness;
 
-  // 2. Get reviews (Yelp only returns up to 3)
-  const reviewsData = (await fetchYelp(
-    `/businesses/${encodeURIComponent(business_id)}/reviews?limit=3&sort_by=newest`
-  )) as YelpReviewsResponse;
-
-  const reviews: IndividualReview[] = reviewsData.reviews.map((r) => ({
-    platform: "Yelp",
-    externalId: r.id,
-    authorName: r.user.name,
-    rating: r.rating,
-    text: r.text,
-    reviewDate: r.time_created,
-  }));
+  // 2. Try to get reviews (Yelp v3 /reviews endpoint may be deprecated for some keys)
+  let reviews: IndividualReview[] = [];
+  try {
+    const reviewsRes = await fetch(
+      `${YELP_API}/businesses/${encodeURIComponent(business_id)}/reviews?limit=3&sort_by=newest`,
+      {
+        headers: {
+          Authorization: `Bearer ${getYelpApiKey()}`,
+          Accept: "application/json",
+        },
+      }
+    );
+    if (reviewsRes.ok) {
+      const reviewsData = (await reviewsRes.json()) as YelpReviewsResponse;
+      reviews = reviewsData.reviews.map((r) => ({
+        platform: "Yelp",
+        externalId: r.id,
+        authorName: r.user.name,
+        rating: r.rating,
+        text: r.text,
+        reviewDate: r.time_created,
+      }));
+    }
+    // If 404 or other error, we just skip reviews (endpoint deprecated)
+  } catch {
+    // Reviews fetch failed — non-fatal, we still have business data
+  }
 
   return {
     rating: business.rating,
