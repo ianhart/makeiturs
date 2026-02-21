@@ -7,6 +7,7 @@ import RequestQueue from "./components/RequestQueue";
 import CampaignTracker from "./components/CampaignTracker";
 import SocialTracker from "./components/SocialTracker";
 import ReviewSnapshot from "./components/ReviewSnapshot";
+import GuestHappiness from "./components/GuestHappiness";
 import AssetLibrary from "./components/AssetLibrary";
 import HuddleNotes from "./components/HuddleNotes";
 import QuickLinks from "./components/QuickLinks";
@@ -66,6 +67,9 @@ export default async function ClientPortal({
           theme={theme}
         />
       </div>
+
+      {/* Guest Happiness — AI-powered review insights */}
+      <GuestHappiness data={client.guestHappiness} theme={theme} />
 
       {/* Asset Library */}
       <AssetLibrary assets={client.assets} theme={theme} />

@@ -182,6 +182,7 @@ export async function updateClientSyncData(
     metricsNarrative?: string;
     weeklyVibe?: string;
     recentReviews?: unknown[];
+    guestHappiness?: unknown;
     syncStatus?: string;
   }
 ): Promise<void> {
@@ -200,6 +201,10 @@ export async function updateClientSyncData(
   if (data.recentReviews !== undefined) {
     const json = JSON.stringify(data.recentReviews);
     await sql`UPDATE clients SET recent_reviews = ${json}::jsonb, updated_at = NOW() WHERE id = ${id}`;
+  }
+  if (data.guestHappiness !== undefined) {
+    const json = JSON.stringify(data.guestHappiness);
+    await sql`UPDATE clients SET guest_happiness = ${json}::jsonb, updated_at = NOW() WHERE id = ${id}`;
   }
   if (data.syncStatus !== undefined) {
     await sql`UPDATE clients SET sync_status = ${data.syncStatus}, updated_at = NOW() WHERE id = ${id}`;

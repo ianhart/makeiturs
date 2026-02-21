@@ -148,6 +148,29 @@ export interface IndividualReview {
   reviewDate: string;
 }
 
+// ─── Guest Happiness (AI-analyzed review data) ──────────────
+
+export interface GuestHappinessData {
+  sentiment: {
+    summary: string;
+    positivePercent: number;
+    negativePercent: number;
+    topPraises: string[];
+    topComplaints: string[];
+  };
+  menuMentions: {
+    items: { name: string; mentions: number; sentiment: "positive" | "mixed" | "negative" }[];
+  };
+  responseTime: {
+    summary: string;
+    avgHours: number | null;
+    repliedCount: number;
+    totalNegative: number;
+  };
+  analyzedAt: string;
+  reviewsAnalyzed: number;
+}
+
 // ─── Sync status ─────────────────────────────────────────────
 
 export type SyncStatus = "idle" | "syncing" | "success" | "error";
@@ -183,6 +206,7 @@ export interface ClientRow {
   metrics_narrative?: string;
   weekly_vibe?: string;
   recent_reviews?: IndividualReview[];
+  guest_happiness?: GuestHappinessData;
   last_sync_at?: string | null;
   sync_status?: SyncStatus;
   created_at: string;
@@ -220,6 +244,7 @@ export interface ClientData {
   metricsNarrative?: string;
   weeklyVibe?: string;
   recentReviews?: IndividualReview[];
+  guestHappiness?: GuestHappinessData;
   lastSyncAt?: string;
   syncStatus?: SyncStatus;
 }
@@ -255,6 +280,7 @@ export function rowToClientData(row: ClientRow): ClientData {
     metricsNarrative: row.metrics_narrative || undefined,
     weeklyVibe: row.weekly_vibe || undefined,
     recentReviews: row.recent_reviews || undefined,
+    guestHappiness: row.guest_happiness || undefined,
     lastSyncAt: row.last_sync_at || undefined,
     syncStatus: row.sync_status || undefined,
   };

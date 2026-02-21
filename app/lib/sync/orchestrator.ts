@@ -22,6 +22,7 @@ import { syncGoogleSearchConsole } from "./google-search-console";
 import { syncGoogleBusiness } from "./google-business";
 import { syncYelp } from "./yelp";
 import { aggregateReviews } from "./review-aggregator";
+import { analyzeReviews } from "./review-analyzer";
 import { buildHumanMetrics, generateMetricsNarrative } from "../metrics-humanizer";
 import type {
   ClickUpConfig,
@@ -30,6 +31,8 @@ import type {
   GoogleBusinessConfig,
   YelpConfig,
   IntegrationProvider,
+  IndividualReview,
+  ReviewPlatform,
 } from "../types";
 import type { GAMetrics } from "./google-analytics";
 import type { GSCMetrics } from "./google-search-console";
@@ -148,6 +151,41 @@ export async function syncClient(clientId: number): Promise<SyncResult> {
       });
     } catch (err) {
       console.error(`[sync] Client ${clientId}: review aggregation failed:`, err);
+    }
+  }
+
+  // ── Post-sync: AI Guest Happiness analysis ──
+  if (gbpData || yelpData) {
+    try {
+      // Gather all individual reviews + platform stats for AI analysis
+      const allReviews: IndividualReview[] = [
+        ...((gbpData?.reviews as IndividualReview[]) || []),
+        ...((yelpData?.reviews as IndividualReview[]) || []),
+      ];
+
+      // Build platform stats for fallback when no review text available
+      const platformStats: ReviewPlatform[] = [];
+      if (gbpData && gbpData.totalReviews > 0) {
+        platformStats.push({
+          platform: "Google",
+          rating: `${gbpData.averageRating.toFixed(1)}/5`,
+          reviewCount: gbpData.totalReviews,
+          responseRate: "N/A",
+        });
+      }
+      if (yelpData && yelpData.reviewCount > 0) {
+        platformStats.push({
+          platform: "Yelp",
+          rating: `${yelpData.rating.toFixed(1)}/5`,
+          reviewCount: yelpData.reviewCount,
+          responseRate: "N/A",
+        });
+      }
+
+      const happiness = await analyzeReviews(allReviews, platformStats);
+      await updateClientSyncData(clientId, { guestHappiness: happiness });
+    } catch (err) {
+      console.error(`[sync] Client ${clientId}: AI review analysis failed:`, err);
     }
   }
 
